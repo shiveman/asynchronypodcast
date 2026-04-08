@@ -1,13 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const episodes = [
-  { number: 10, title: "Me vs. We" },
-  { number: 9, title: "By Any Other Name" },
-  { number: 8, title: "Are You a Fascist?" },
-  { number: 7, title: "What Have We Wrought?" },
-  { number: 6, title: "I'm Good" },
-  { number: 5, title: "The Identity" },
+const featuredEpisode = {
+  number: 7,
+  title: "What Have We Wrought?",
+  videoId: "f5X202BrAio",
+  url: "https://www.youtube.com/watch?v=f5X202BrAio",
+};
+
+const recentEpisodes = [
+  { number: 10, title: "Me vs. We", url: "https://www.youtube.com/@asynchronypodcast" },
+  { number: 9, title: "By Any Other Name", url: "https://www.youtube.com/@asynchronypodcast" },
+  { number: 8, title: "Are You a Fascist?", url: "https://www.youtube.com/@asynchronypodcast" },
 ];
 
 export default function Home() {
@@ -111,38 +115,67 @@ export default function Home() {
       {/* Episodes */}
       <section id="episodes" className="px-8 pb-24 max-w-5xl mx-auto">
         <h2 className="text-2xl font-bold tracking-tight mb-8">Latest Episodes</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {episodes.map((ep) => (
-            <Link
-              key={ep.number}
-              href="https://www.youtube.com/@asynchronypodcast"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative flex flex-col justify-end rounded-2xl overflow-hidden border border-white/10 hover:border-white/25 transition-all bg-white/5 hover:bg-white/8 p-6 min-h-[140px]"
-            >
-              <div className="absolute top-4 right-4">
-                <span className="text-xs text-zinc-500 font-mono">EP. {String(ep.number).padStart(2, "0")}</span>
-              </div>
-              <div className="flex items-center gap-3 mt-auto">
-                <div className="w-8 h-8 rounded-full bg-red-600/20 flex items-center justify-center flex-shrink-0">
-                  <svg className="w-3.5 h-3.5 text-red-400 translate-x-0.5" viewBox="0 0 24 24" fill="currentColor">
+        <div className="flex flex-col md:flex-row gap-6">
+
+          {/* Featured video */}
+          <Link
+            href={featuredEpisode.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex-[2] rounded-2xl overflow-hidden border border-white/10 hover:border-white/25 transition-all bg-white/5"
+          >
+            <div className="relative aspect-video w-full overflow-hidden">
+              <Image
+                src={`https://img.youtube.com/vi/${featuredEpisode.videoId}/maxresdefault.jpg`}
+                alt={featuredEpisode.title}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full bg-black/60 flex items-center justify-center backdrop-blur-sm group-hover:bg-red-600/80 transition-colors">
+                  <svg className="w-6 h-6 text-white translate-x-0.5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M8 5v14l11-7z"/>
                   </svg>
                 </div>
-                <h3 className="font-semibold text-white group-hover:text-zinc-100 leading-tight">{ep.title}</h3>
               </div>
-            </Link>
-          ))}
-        </div>
-        <div className="mt-8 text-center">
-          <Link
-            href="https://www.youtube.com/@asynchronypodcast"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-zinc-400 hover:text-white transition-colors underline underline-offset-4"
-          >
-            View all episodes on YouTube →
+            </div>
+            <div className="p-5">
+              <span className="text-xs text-zinc-500 font-mono">EP. {String(featuredEpisode.number).padStart(2, "0")}</span>
+              <h3 className="mt-1 text-lg font-bold text-white group-hover:text-zinc-100">{featuredEpisode.title}</h3>
+            </div>
           </Link>
+
+          {/* Recent episodes list */}
+          <div className="flex-1 flex flex-col gap-3">
+            {recentEpisodes.map((ep) => (
+              <Link
+                key={ep.number}
+                href={ep.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-4 rounded-2xl border border-white/10 hover:border-white/25 transition-all bg-white/5 hover:bg-white/8 p-5"
+              >
+                <div className="w-10 h-10 rounded-full bg-red-600/20 flex items-center justify-center flex-shrink-0 group-hover:bg-red-600/40 transition-colors">
+                  <svg className="w-4 h-4 text-red-400 translate-x-0.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span className="text-xs text-zinc-500 font-mono">EP. {String(ep.number).padStart(2, "0")}</span>
+                  <h3 className="font-semibold text-white group-hover:text-zinc-100 leading-tight">{ep.title}</h3>
+                </div>
+              </Link>
+            ))}
+            <Link
+              href="https://www.youtube.com/@asynchronypodcast"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-auto text-sm text-zinc-400 hover:text-white transition-colors underline underline-offset-4 text-center pt-2"
+            >
+              View all episodes →
+            </Link>
+          </div>
+
         </div>
       </section>
 
