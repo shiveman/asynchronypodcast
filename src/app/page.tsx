@@ -20,6 +20,7 @@ export default function Home() {
           alt="Asynchrony logo"
           width={140}
           height={48}
+          className="rounded-xl"
           priority
         />
         <div className="flex items-center gap-8 text-sm font-medium text-zinc-400">
