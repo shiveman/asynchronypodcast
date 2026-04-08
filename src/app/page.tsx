@@ -19,14 +19,16 @@ export default function Home() {
     <div className="min-h-screen bg-[#0a0d14] text-white font-sans">
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-white/10">
-        <Image
-          src="/logo_black.png"
-          alt="Asynchrony logo"
-          width={140}
-          height={48}
-          className="rounded-xl"
-          priority
-        />
+        <Link href="https://www.asynchronypodcast.com">
+          <Image
+            src="/logo_black.png"
+            alt="Asynchrony logo"
+            width={140}
+            height={48}
+            className="rounded-xl"
+            priority
+          />
+        </Link>
         <div className="flex items-center gap-3 text-sm font-medium text-zinc-400">
           <Link href="#episodes" className="hover:text-white transition-colors px-2">Episodes</Link>
           <Link href="#about" className="hover:text-white transition-colors px-2">About</Link>
