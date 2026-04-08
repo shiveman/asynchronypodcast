@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const featuredEpisode = {
-  number: 7,
+  label: "Promo",
   title: "What Have We Wrought?",
   videoId: "f5X202BrAio",
   url: "https://www.youtube.com/watch?v=f5X202BrAio",
@@ -140,7 +140,7 @@ export default function Home() {
               </div>
             </div>
             <div className="p-5">
-              <span className="text-xs text-zinc-500 font-mono">EP. {String(featuredEpisode.number).padStart(2, "0")}</span>
+              <span className="text-xs text-zinc-500 font-mono uppercase tracking-wider">{featuredEpisode.label}</span>
               <h3 className="mt-1 text-lg font-bold text-white group-hover:text-zinc-100">{featuredEpisode.title}</h3>
             </div>
           </Link>
