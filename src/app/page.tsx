@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const featuredEpisode = {
-  label: "Promo",
+  label: "Featured",
   title: "What Have We Wrought?",
   videoId: "f5X202BrAio",
   url: "https://www.youtube.com/watch?v=f5X202BrAio",
