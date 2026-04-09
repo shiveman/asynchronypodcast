@@ -19,7 +19,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#0a0d14] text-white font-sans">
       {/* Nav */}
       <nav className="flex items-center justify-between px-8 py-5 border-b border-white/10">
-        <Link href="https://www.asynchronypodcast.com">
+        <Link href="https://asynchronypodcast.com">
           <Image
             src="/logo_black.png"
             alt="Asynchrony logo"
