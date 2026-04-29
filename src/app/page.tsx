@@ -33,27 +33,54 @@ async function getChannelStats(): Promise<ChannelStats> {
 
 async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
   try {
-    const res = await fetch(
-      `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`,
+    const apiKey = process.env.YOUTUBE_API_KEY;
+
+    // Fetch the 15 most recent videos from the channel
+    const searchRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&maxResults=15&order=date&type=video&key=${apiKey}`,
       { next: { revalidate: 3600 } }
     );
-    const xml = await res.text();
-    const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)];
+    const searchData = await searchRes.json();
+    const items: { id: { videoId: string }; snippet: { title: string } }[] =
+      searchData.items ?? [];
 
-    return entries
-      .map((entry) => {
-        const content = entry[1];
-        const videoId = content.match(/<yt:videoId>(.*?)<\/yt:videoId>/)?.[1];
-        const title = content.match(/<title>(.*?)<\/title>/)?.[1];
-        const link = content.match(/<link[^>]+href="([^"]+)"/)?.[1] ?? "";
-        if (!videoId || !title) return null;
-        // Shorts have /shorts/ in their link URL — definitively reliable
-        const isShort = link.includes("/shorts/");
-        if (isShort || videoId === excludeVideoId) return null;
-        return { videoId, title, url: `https://www.youtube.com/watch?v=${videoId}` };
+    const videoIds = items
+      .map((v) => v.id.videoId)
+      .filter((id) => id !== excludeVideoId)
+      .join(",");
+
+    if (!videoIds) return [];
+
+    // Fetch durations to filter out Shorts (≤ 60 seconds)
+    const detailRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${apiKey}`,
+      { next: { revalidate: 3600 } }
+    );
+    const detailData = await detailRes.json();
+
+    const durations: Record<string, number> = {};
+    for (const item of detailData.items ?? []) {
+      // ISO 8601 duration e.g. PT1M30S → parse seconds
+      const d = item.contentDetails.duration as string;
+      const m = d.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+      const seconds =
+        (parseInt(m?.[1] ?? "0") * 3600) +
+        (parseInt(m?.[2] ?? "0") * 60) +
+        parseInt(m?.[3] ?? "0");
+      durations[item.id] = seconds;
+    }
+
+    return items
+      .filter((v) => {
+        const id = v.id.videoId;
+        return id !== excludeVideoId && (durations[id] ?? 0) > 60;
       })
-      .filter((v): v is Video => v !== null)
-      .slice(0, 3);
+      .slice(0, 3)
+      .map((v) => ({
+        videoId: v.id.videoId,
+        title: v.snippet.title,
+        url: `https://www.youtube.com/watch?v=${v.id.videoId}`,
+      }));
   } catch {
     return [];
   }
