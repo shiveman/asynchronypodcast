@@ -12,6 +12,19 @@ const featuredEpisode = {
 
 type Video = { videoId: string; title: string; url: string };
 
+async function isShort(videoId: string): Promise<boolean> {
+  try {
+    const res = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
+      redirect: "manual",
+      next: { revalidate: 86400 }, // cache short-check for 24 hours
+    });
+    // Real Shorts return 200; regular videos get redirected away (301/303)
+    return res.status === 200;
+  } catch {
+    return false;
+  }
+}
+
 async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
   try {
     const res = await fetch(
@@ -20,7 +33,8 @@ async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
     );
     const xml = await res.text();
     const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)];
-    return entries
+
+    const candidates = entries
       .map((entry) => {
         const content = entry[1];
         const videoId = content.match(/<yt:videoId>(.*?)<\/yt:videoId>/)?.[1];
@@ -30,7 +44,11 @@ async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
       })
       .filter((v): v is Video => v !== null)
       .filter((v) => v.videoId !== excludeVideoId)
-      .slice(0, 3);
+      .slice(0, 15); // check up to 15 to find 3 non-shorts
+
+    const shortFlags = await Promise.all(candidates.map((v) => isShort(v.videoId)));
+
+    return candidates.filter((_, i) => !shortFlags[i]).slice(0, 3);
   } catch {
     return [];
   }
