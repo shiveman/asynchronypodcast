@@ -14,11 +14,12 @@ type Video = { videoId: string; title: string; url: string };
 
 async function isShort(videoId: string): Promise<boolean> {
   try {
-    const res = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
-      redirect: "manual",
-      next: { revalidate: 86400 }, // cache short-check for 24 hours
-    });
-    // Real Shorts return 200; regular videos get redirected away (301/303)
+    // YouTube only generates a portrait thumbnail (oardefault.jpg) for Shorts.
+    // Regular videos return 404 for this URL.
+    const res = await fetch(
+      `https://i.ytimg.com/vi/${videoId}/oardefault.jpg`,
+      { method: "HEAD", next: { revalidate: 86400 } }
+    );
     return res.status === 200;
   } catch {
     return false;
