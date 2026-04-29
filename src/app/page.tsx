@@ -26,10 +26,10 @@ async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
         const content = entry[1];
         const videoId = content.match(/<yt:videoId>(.*?)<\/yt:videoId>/)?.[1];
         const title = content.match(/<title>(.*?)<\/title>/)?.[1];
-        const description = content.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? "";
+        const link = content.match(/<link[^>]+href="([^"]+)"/)?.[1] ?? "";
         if (!videoId || !title) return null;
-        // Filter out Shorts — YouTube guidelines require #Shorts in title or description
-        const isShort = /#shorts/i.test(title) || /#shorts/i.test(description);
+        // Shorts have /shorts/ in their link URL — definitively reliable
+        const isShort = link.includes("/shorts/");
         if (isShort || videoId === excludeVideoId) return null;
         return { videoId, title, url: `https://www.youtube.com/watch?v=${videoId}` };
       })
