@@ -73,7 +73,7 @@ async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
     return items
       .filter((v) => {
         const id = v.id.videoId;
-        return id !== excludeVideoId && (durations[id] ?? 0) > 60;
+        return id !== excludeVideoId && (durations[id] ?? 0) > 180;
       })
       .slice(0, 3)
       .map((v) => ({
