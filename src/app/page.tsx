@@ -12,20 +12,6 @@ const featuredEpisode = {
 
 type Video = { videoId: string; title: string; url: string };
 
-async function isShort(videoId: string): Promise<boolean> {
-  try {
-    // YouTube only generates a portrait thumbnail (oardefault.jpg) for Shorts.
-    // Regular videos return 404 for this URL.
-    const res = await fetch(
-      `https://i.ytimg.com/vi/${videoId}/oardefault.jpg`,
-      { method: "HEAD", next: { revalidate: 86400 } }
-    );
-    return res.status === 200;
-  } catch {
-    return false;
-  }
-}
-
 async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
   try {
     const res = await fetch(
@@ -35,21 +21,20 @@ async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
     const xml = await res.text();
     const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)];
 
-    const candidates = entries
+    return entries
       .map((entry) => {
         const content = entry[1];
         const videoId = content.match(/<yt:videoId>(.*?)<\/yt:videoId>/)?.[1];
         const title = content.match(/<title>(.*?)<\/title>/)?.[1];
+        const description = content.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? "";
         if (!videoId || !title) return null;
+        // Filter out Shorts — YouTube guidelines require #Shorts in title or description
+        const isShort = /#shorts/i.test(title) || /#shorts/i.test(description);
+        if (isShort || videoId === excludeVideoId) return null;
         return { videoId, title, url: `https://www.youtube.com/watch?v=${videoId}` };
       })
       .filter((v): v is Video => v !== null)
-      .filter((v) => v.videoId !== excludeVideoId)
-      .slice(0, 15); // check up to 15 to find 3 non-shorts
-
-    const shortFlags = await Promise.all(candidates.map((v) => isShort(v.videoId)));
-
-    return candidates.filter((_, i) => !shortFlags[i]).slice(0, 3);
+      .slice(0, 3);
   } catch {
     return [];
   }
