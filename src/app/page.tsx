@@ -11,6 +11,25 @@ const featuredEpisode = {
 };
 
 type Video = { videoId: string; title: string; url: string };
+type ChannelStats = { subscribers: string; videos: string };
+
+async function getChannelStats(): Promise<ChannelStats> {
+  try {
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${CHANNEL_ID}&key=${apiKey}`,
+      { next: { revalidate: 3600 } }
+    );
+    const data = await res.json();
+    const stats = data.items?.[0]?.statistics;
+    return {
+      subscribers: Number(stats?.subscriberCount ?? 0).toLocaleString(),
+      videos: Number(stats?.videoCount ?? 0).toLocaleString(),
+    };
+  } catch {
+    return { subscribers: "—", videos: "—" };
+  }
+}
 
 async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
   try {
@@ -41,7 +60,10 @@ async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
 }
 
 export default async function Home() {
-  const recentVideos = await getLatestVideos(featuredEpisode.videoId);
+  const [recentVideos, stats] = await Promise.all([
+    getLatestVideos(featuredEpisode.videoId),
+    getChannelStats(),
+  ]);
 
   return (
     <div className="min-h-screen bg-[#0a0d14] text-white font-sans">
@@ -229,11 +251,11 @@ export default async function Home() {
           </div>
           <div className="flex flex-col gap-4 min-w-[180px]">
             <div className="flex flex-col items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-600/10 p-5 text-center">
-              <span className="text-3xl font-bold text-blue-400">48</span>
+              <span className="text-3xl font-bold text-blue-400">{stats.videos}</span>
               <span className="text-xs text-zinc-500 mt-1">Episodes</span>
             </div>
             <div className="flex flex-col items-center justify-center rounded-2xl border border-red-500/20 bg-red-600/10 p-5 text-center">
-              <span className="text-3xl font-bold text-red-400">231</span>
+              <span className="text-3xl font-bold text-red-400">{stats.subscribers}</span>
               <span className="text-xs text-zinc-500 mt-1">Subscribers</span>
             </div>
           </div>
