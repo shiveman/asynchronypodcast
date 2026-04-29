@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+const CHANNEL_ID = "UCy7UQNSLZVLJaiFkvMw7ufA";
+
 const featuredEpisode = {
   label: "Featured",
   title: "What Have We Wrought?",
@@ -8,13 +10,35 @@ const featuredEpisode = {
   url: "https://www.youtube.com/watch?v=f5X202BrAio",
 };
 
-const recentEpisodes = [
-  { number: 10, title: "Me vs. We", url: "https://www.youtube.com/@asynchronypodcast" },
-  { number: 9, title: "By Any Other Name", url: "https://www.youtube.com/@asynchronypodcast" },
-  { number: 8, title: "Are You a Fascist?", url: "https://www.youtube.com/@asynchronypodcast" },
-];
+type Video = { videoId: string; title: string; url: string };
 
-export default function Home() {
+async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
+  try {
+    const res = await fetch(
+      `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`,
+      { next: { revalidate: 3600 } }
+    );
+    const xml = await res.text();
+    const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)];
+    return entries
+      .map((entry) => {
+        const content = entry[1];
+        const videoId = content.match(/<yt:videoId>(.*?)<\/yt:videoId>/)?.[1];
+        const title = content.match(/<title>(.*?)<\/title>/)?.[1];
+        if (!videoId || !title) return null;
+        return { videoId, title, url: `https://www.youtube.com/watch?v=${videoId}` };
+      })
+      .filter((v): v is Video => v !== null)
+      .filter((v) => v.videoId !== excludeVideoId)
+      .slice(0, 3);
+  } catch {
+    return [];
+  }
+}
+
+export default async function Home() {
+  const recentVideos = await getLatestVideos(featuredEpisode.videoId);
+
   return (
     <div className="min-h-screen bg-[#0a0d14] text-white font-sans">
       {/* Nav */}
@@ -147,12 +171,12 @@ export default function Home() {
             </div>
           </Link>
 
-          {/* Recent episodes list */}
+          {/* Recent episodes list — auto-populated from YouTube RSS */}
           <div className="flex-1 flex flex-col gap-3">
-            {recentEpisodes.map((ep) => (
+            {recentVideos.map((video) => (
               <Link
-                key={ep.number}
-                href={ep.url}
+                key={video.videoId}
+                href={video.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center gap-4 rounded-2xl border border-white/10 hover:border-white/25 transition-all bg-white/5 hover:bg-white/8 p-5"
@@ -162,10 +186,7 @@ export default function Home() {
                     <path d="M8 5v14l11-7z"/>
                   </svg>
                 </div>
-                <div>
-                  <span className="text-xs text-zinc-500 font-mono">EP. {String(ep.number).padStart(2, "0")}</span>
-                  <h3 className="font-semibold text-white group-hover:text-zinc-100 leading-tight">{ep.title}</h3>
-                </div>
+                <h3 className="font-semibold text-white group-hover:text-zinc-100 leading-tight">{video.title}</h3>
               </Link>
             ))}
             <Link
