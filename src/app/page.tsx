@@ -13,6 +13,18 @@ const featuredEpisode = {
 type Video = { videoId: string; title: string; url: string };
 type ChannelStats = { subscribers: string; videos: string };
 
+function decodeHtml(str: string): string {
+  return str
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCharCode(parseInt(code, 16)));
+}
+
 async function getChannelStats(): Promise<ChannelStats> {
   try {
     const apiKey = process.env.YOUTUBE_API_KEY;
@@ -78,7 +90,7 @@ async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
       .slice(0, 3)
       .map((v) => ({
         videoId: v.id.videoId,
-        title: v.snippet.title,
+        title: decodeHtml(v.snippet.title),
         url: `https://www.youtube.com/watch?v=${v.id.videoId}`,
       }));
   } catch {
