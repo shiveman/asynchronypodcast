@@ -279,7 +279,7 @@ export default async function Home() {
           <div className="flex flex-col gap-4 min-w-[180px]">
             <div className="flex flex-col items-center justify-center rounded-2xl border border-blue-500/20 bg-blue-600/10 p-5 text-center">
               <span className="text-3xl font-bold text-blue-400">{stats.videos}</span>
-              <span className="text-xs text-zinc-500 mt-1">Episodes</span>
+              <span className="text-xs text-zinc-500 mt-1">Videos</span>
             </div>
             <div className="flex flex-col items-center justify-center rounded-2xl border border-red-500/20 bg-red-600/10 p-5 text-center">
               <span className="text-3xl font-bold text-red-400">{stats.subscribers}</span>
