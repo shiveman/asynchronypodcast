@@ -154,6 +154,17 @@ export default async function Home() {
             </svg>
             Spotify
           </Link>
+          <Link
+            href="https://www.patreon.com/asynchronypodcast"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 bg-[#FF424D] hover:bg-[#e6333e] transition-colors text-white px-4 py-2 rounded-full text-sm font-semibold"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.82 2.41C11.53 2.41 8.85 5.1 8.85 8.39c0 3.28 2.68 5.95 5.97 5.95 3.28 0 5.95-2.67 5.95-5.95 0-3.29-2.67-5.98-5.95-5.98zM2.18 21.59h3.09V2.41H2.18v19.18z"/>
+            </svg>
+            Patreon
+          </Link>
         </div>
       </nav>
 
@@ -193,6 +204,34 @@ export default async function Home() {
               Learn More
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Divider */}
+      <div className="flex items-center gap-0 px-8 mb-16">
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-blue-600 to-transparent opacity-50" />
+        <div className="mx-4 w-2 h-2 rounded-full bg-white/30" />
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-red-600 to-transparent opacity-50" />
+      </div>
+
+      {/* Patreon */}
+      <section className="px-8 pb-16 max-w-5xl mx-auto">
+        <h2 className="text-2xl font-bold tracking-tight mb-6">Join Us</h2>
+        <div className="flex flex-col md:flex-row md:items-center gap-8">
+          <p className="text-zinc-300 text-lg leading-relaxed flex-1">
+            If you are tired of the toxic polarization of American politics, join our growing Patreon community. You will get detailed transcripts and a summary and analysis of every episode. You will also be able to add your voice to our growing community in the Asynchrony group chat. Help us change the world for the price of a latte each month and be a part of our conversation.
+          </p>
+          <Link
+            href="https://www.patreon.com/asynchronypodcast"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-[#FF424D] hover:bg-[#e6333e] transition-colors text-white px-6 py-3 rounded-full font-semibold shrink-0 self-start md:self-center"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14.82 2.41C11.53 2.41 8.85 5.1 8.85 8.39c0 3.28 2.68 5.95 5.97 5.95 3.28 0 5.95-2.67 5.95-5.95 0-3.29-2.67-5.98-5.95-5.98zM2.18 21.59h3.09V2.41H2.18v19.18z"/>
+            </svg>
+            Become a member
+          </Link>
         </div>
       </section>
 
