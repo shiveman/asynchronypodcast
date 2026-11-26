@@ -47,9 +47,9 @@ async function getLatestVideos(excludeVideoId: string): Promise<Video[]> {
   try {
     const apiKey = process.env.YOUTUBE_API_KEY;
 
-    // Fetch the 15 most recent videos from the channel
+    // Fetch the 25 most recent videos from the channel
     const searchRes = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&maxResults=15&order=date&type=video&key=${apiKey}`,
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${CHANNEL_ID}&maxResults=25&order=date&type=video&key=${apiKey}`,
       { next: { revalidate: 3600 } }
     );
     const searchData = await searchRes.json();
